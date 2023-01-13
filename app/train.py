@@ -60,7 +60,7 @@ def main(args):
   env.seed(workerseed)
 
   
-  CustomPolicy = get_network_arch(args.env_name)
+  #CustomPolicy = get_network_arch(args.env_name)
 
   params = {'gamma':args.gamma
     , 'timesteps_per_actorbatch':args.timesteps_per_actorbatch

@@ -10,6 +10,7 @@ import config
 from stable_baselines import logger
 
 def selfplay_wrapper(env):
+    print("the evn is ", env)
     class SelfPlayEnv(env):
         # wrapper over the normal single player env, but loads the best self play model
         def __init__(self, opponent_type, verbose):

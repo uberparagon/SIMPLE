@@ -1,4 +1,4 @@
-
+import stable_baselines
 
 def get_environment(env_name):
     try:
@@ -20,12 +20,17 @@ def get_environment(env_name):
         elif env_name in ('frouge'):
             from frouge.envs.frouge import FlammeRougeEnv
             return FlammeRougeEnv
+        elif env_name in ('pig'):
+            print("trying to load pig!!")
+            from pig.envs.pig import PigEnv
+            return PigEnv
         else:
             raise Exception(f'No environment found for {env_name}')
     except SyntaxError as e:
         print(e)
         raise Exception(f'Syntax Error for {env_name}!')
-    except:
+    except e:
+        print("Eception",e)
         raise Exception(f'Install the environment first using: \nbash scripts/install_env.sh {env_name}\nAlso ensure the environment is added to /utils/register.py')
     
 
@@ -49,6 +54,9 @@ def get_network_arch(env_name):
     elif env_name in ('frouge'):
         from models.frouge.models import CustomPolicy
         return CustomPolicy
+    elif env_name in ('pig'):
+        from models.pig.models import CustomPolicy
+        return stable_baselines.common.policies.MlpPolicy
     else:
         raise Exception(f'No model architectures found for {env_name}')
 
