@@ -35,26 +35,35 @@ class PigEnv(gym.Env):
     def current_player(self):
         return self.players[self.current_player_num]
 
+
     def step(self, action):
+
         reward = [0] * self.n_players
         done = False
 
+        if self.cur_turn_first_roll:
+            self.current_pot = self.roll()
+            self.cur_turn_first_roll = False
+
         if action == 0: #hold
             self.players[self.current_player_num].score += self.current_pot
-            self.current_player_num = (self.current_player_num + 1) % self.n_players
-            self.current_pot = self.roll()
+            self.end_turn()
         else:
-            cur_roll = self.roll()
-            if cur_roll == 1:
-                self.current_player_num = (self.current_player_num + 1) % self.n_players
-                self.current_pot = self.roll()
+            new_roll = self.roll()
+            if new_roll == 1:
+                self.end_turn()
             else:
-                self.current_pot += cur_roll
+                self.current_pot += new_roll
                 if self.current_pot + self.players[self.current_player_num].score >= self.score_to_win:
                     reward[self.current_player_num] = 1
                     done = True
         
         return self.observation, reward, done, {}
+
+    def end_turn(self):
+        self.current_player_num = (self.current_player_num + 1) % self.n_players
+        self.current_pot = 0
+        self.cur_turn_first_roll = True
 
     def roll(self):
         return random.randint(1,6)
@@ -63,6 +72,7 @@ class PigEnv(gym.Env):
         self.players = []
         self.current_player_num = 0
         self.current_pot = self.roll()
+        self.cur_turn_first_roll = True
         
 
         player_id = 1
