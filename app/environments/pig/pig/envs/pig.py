@@ -54,16 +54,19 @@ class PigEnv(gym.Env):
                 self.end_turn()
             else:
                 self.current_pot += new_roll
+                self.save_obs = self.observation
                 if self.current_pot + self.players[self.current_player_num].score >= self.score_to_win:
                     reward[self.current_player_num] = 1
                     done = True
+
         
-        return self.observation, reward, done, {}
+        return self.save_obs, reward, done, {}
 
     def end_turn(self):
-        self.current_player_num = (self.current_player_num + 1) % self.n_players
         self.current_pot = 0
         self.cur_turn_first_roll = True
+        self.save_obs = self.observation
+        self.current_player_num = (self.current_player_num + 1) % self.n_players
 
     def roll(self):
         return random.randint(1,6)
@@ -95,6 +98,7 @@ class PigEnv(gym.Env):
             logger.debug(f'\nPlayer {p.id}\'s points: {p.score}')
 
         logger.debug(f'\nCurrent pot: {self.current_pot}')
+        logger.debug(f'\nCurrent obs: {self.observation}')
 
     def rules_move(self):
         action_probs = [0.01] * self.action_space.n
