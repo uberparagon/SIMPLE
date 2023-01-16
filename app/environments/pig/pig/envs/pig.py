@@ -36,17 +36,15 @@ class PigEnv(gym.Env):
         return self.players[self.current_player_num]
 
 
+
     def step(self, action):
 
         reward = [0] * self.n_players
         done = False
 
-        if self.cur_turn_first_roll:
-            self.current_pot = self.roll()
-            self.cur_turn_first_roll = False
-
         if action == 0: #hold
             self.players[self.current_player_num].score += self.current_pot
+            reward[self.current_player_num] += self.current_pot
             self.end_turn()
         else:
             new_roll = self.roll()
@@ -54,17 +52,18 @@ class PigEnv(gym.Env):
                 self.end_turn()
             else:
                 self.current_pot += new_roll
+                reward[self.current_player_num] += new_roll
                 self.save_obs = self.observation
                 if self.current_pot + self.players[self.current_player_num].score >= self.score_to_win:
-                    reward[self.current_player_num] = 1
+                    reward[self.current_player_num] += 100
                     done = True
 
+        
         
         return self.save_obs, reward, done, {}
 
     def end_turn(self):
         self.current_pot = 0
-        self.cur_turn_first_roll = True
         self.save_obs = self.observation
         self.current_player_num = (self.current_player_num + 1) % self.n_players
 
@@ -74,9 +73,7 @@ class PigEnv(gym.Env):
     def reset(self):
         self.players = []
         self.current_player_num = 0
-        self.current_pot = self.roll()
-        self.cur_turn_first_roll = True
-        
+        self.current_pot = 0
 
         player_id = 1
         for p in range(self.n_players):
